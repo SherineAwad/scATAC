@@ -10,6 +10,9 @@ library(Matrix)
 library(dplyr)
 set.seed(1234)
 
+#install.packages("Matrix", type = "source",repos = "http://cran.us.r-project.org")
+#install.packages("irlba", type = "source",repos = "http://cran.us.r-project.org")
+
 args <- commandArgs(trailingOnly = TRUE)
 
 mysample = args[1]
@@ -22,27 +25,28 @@ myh5
 mytsv 
 myRDS 
 ## Prepare genome annotation 
-annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79)
-seqlevelsStyle(annotation) <- 'UCSC'
-genome(annotation) <- "mm10"
+#annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79)
+#genome(annotation) <- "mm10"
 # Check annotation seqnames
-unique(seqnames(annotation))
+#unique(seqnames(annotation))
 
+edb <- EnsDb.Mmusculus.v79
+seqlevelsStyle(edb) <- "UCSC"
+annotation <- GetGRangesFromEnsDb(edb)
 
 ###load sample, the RNA and ATAC data
 counts <- Read10X_h5(myh5)
-head(counts)
+#No need to print a long list now 
+#head(counts)
 # Check counts
 lapply(counts, dim)
 lapply(counts, class)
-
-fragpath <-(mytsv)
 
 # create a Seurat object containing the RNA adata
 myObject <- CreateSeuratObject(counts = counts$`Gene Expression`,assay = "RNA", project=mysample)
 
 # create ATAC assay and add it to the object
-myObject[["ATAC"]] <- CreateChromatinAssay(counts = counts$Peaks,sep = c(":", "-"),fragments = fragpath,annotation = annotation)
+myObject[["ATAC"]] <- CreateChromatinAssay(counts = counts$Peaks,sep = c(":", "-"),fragments = mytsv,annotation = annotation)
 
 ## Quality control
 DefaultAssay(myObject) <- "ATAC"
@@ -53,6 +57,11 @@ head(Fragments(myObject)[[1]])
 
 myObject <- TSSEnrichment(myObject)
 
+#print("This needs some feature from cell-ranger atac") 
+#myObject$pct_reads_in_peaks <- myObject$peak_region_fragments / myObject$passed_filters * 100
+#myObject$blacklist_ratio <- myObject$blacklist_region_fragments / myObject$peak_region_fragments
+
+
 DefaultAssay(myObject) <- "RNA"
 myObject[["percent.mt"]] <- PercentageFeatureSet(myObject, pattern = "^mt-")
 
@@ -60,61 +69,114 @@ myObject[["percent.mt"]] <- PercentageFeatureSet(myObject, pattern = "^mt-")
 figure_name <- ""
 figure_name <- paste(mysample, "_QC_vlnplot.pdf", sep="") 
 pdf(file=figure_name)
-VlnPlot(object = myObject, features = c("nCount_RNA", "nFeature_RNA", "nCount_ATAC", "TSS.enrichment", "nucleosome_signal", "percent.mt"), size.title.use =0.1,  pt.size=0.1, ncol = 6)
+VlnPlot(object = myObject, features = c("nCount_RNA", "nFeature_RNA", "nCount_ATAC", "TSS.enrichment", "nucleosome_signal", "percent.mt"),pt.size=0.1, ncol = 6)
 dev.off()
+
+#myObject$high.tss <- ifelse(myObject$TSS.enrichment > 2, 'High', 'Low')
+#figure_name <- "" 
+#figure_name <- paste(mysample, "TSS_plot.pdf", sep="")
+#pdf(file=figure_name)
+#TSSPlot(myObject, group.by = 'high.tss') + NoLegend()
+#dev.off() 
+#myObject$nucleosome_group <- ifelse(myObject$nucleosome_signal > 1.2, 'NS > 1.2', 'NS < 1.2')
+#figure_name <- "" 
+#figure_name <- paste(mysample, "nucleosome_plot.pdf", sep="")
+#pdf(file=figure_name)
+#FragmentHistogram(object = myObject, group.by = 'nucleosome_group')
+#dev.off()
 
 myObject <- subset(x = myObject,subset = nCount_ATAC < 100000 & nCount_RNA < 30000 & nCount_ATAC > 1000 & nCount_RNA > 1000 & nFeature_RNA > 500 & nucleosome_signal < 1.2 & TSS.enrichment > 2 & percent.mt < 15)
 
 
-#myObject$pct_reads_in_peaks <- myObject$peak_region_fragments / myObject$passed_filters * 100
-#myObject$blacklist_ratio <- myObject$blacklist_region_fragments / myObject$peak_region_fragments
+#### Analyze RNA part
 
-figure_name <- ""
-figure_name <- paste(mysample, "_ATAC_DensityScatter.pdf", sep="") 
-pdf(file=figure_name)
-DensityScatter(myObject, x = 'nCount_ATAC', y = 'TSS.enrichment', log_x = TRUE, quantiles = TRUE)
-dev.off()
+DefaultAssay(myObject) <- "RNA"
 
-figure_name <- ""
-figure_name <- paste(mysample, "_RNA_DensityScatter.pdf", sep="")
-pdf(file=figure_name) 
-DensityScatter(myObject, x ='nCount_RNA', y = 'TSS.enrichment', log_x = TRUE, quantiles = TRUE)
-dev.off() 
+myObject <- SCTransform(myObject, verbose = FALSE) %>% RunPCA() %>% RunUMAP(dims = 1:30, reduction.name = 'umap.rna', reduction.key = 'UMAP_')
+
+#### Analyze ATAC part
+
+DefaultAssay(myObject) <- "ATAC"
+myObject <- RunTFIDF(myObject)
+myObject <- FindTopFeatures(myObject, min.cutoff = 20)
+myObject <- RunSVD(myObject)
+myObject <- RunUMAP(myObject, dims = 2:30, reduction = 'lsi',reduction.name = "umap.atac", reduction.key = "atacUMAP_")
 
 figure_name <- "" 
-figure_name <- paste(mysample, "nucleosome_signalDensityScatter.pdf", sep="") 
-pdf(file=figure_name) 
-DensityScatter(myObject, x = 'nucleosome_signal' , y = 'TSS.enrichment', log_x = TRUE, quantiles = TRUE) 
-dev.off() 
-
-figure_name <- ""
-figure_name <- paste(mysample, "_vlpot.pdf", sep="")
-pdf(file="vlplot.pdf")
-VlnPlot(
-  object = myObject,
-  features = c('nCount_RNA', 'nFeature_RNA', 'nCount_ATAC', 'TSS.enrichment', 'nucleosome_signal'),
-  pt.size = 0.1,
-  ncol = 5, 
-  size.title.use = 0.1
-)
-dev.off()
-
-figure_name <- ""
-figure_name <- paste(mysample, "_FragmentHist.pdf", sep="")
+figure_name <- paste(mysample, "depth_cor.pdf", sep="")
 pdf(file=figure_name)
-myObject$nucleosome_group <- ifelse(myObject$nucleosome_signal > 4, 'NS > 4', 'NS < 4')
-FragmentHistogram(object = myObject, group.by = 'nucleosome_group')
+DepthCor(myObject)
+dev.off()
+
+### Combine RNA and ATAC with WNN analysis
+
+myObject <- FindMultiModalNeighbors(myObject, reduction.list = list("pca", "lsi"),dims.list = list(1:30, 2:30))
+
+myObject <- RunUMAP(myObject, nn.name = "weighted.nn", reduction.name = "umap.wnn", reduction.key ="wnnUMAP_")
+
+myObject <- FindClusters(myObject, graph.name = "wsnn", resolution = 0.8, algorithm = 3, verbose = FALSE)
+
+figure_name <- ""
+figure_name <- paste(mysample, "dim_plot.pdf", sep="")
+pdf(file=figure_name)
+DimPlot(object = myObject, label = TRUE) + NoLegend() 
+dev.off()
+
+
+p1 <- DimPlot(myObject, reduction = "umap.rna", group.by = "seurat_clusters", label = TRUE, repel = TRUE) + ggtitle("RNA")
+
+p2 <- DimPlot(myObject, reduction = "umap.atac",group.by = "seurat_clusters", label = TRUE,  repel = TRUE) + ggtitle("ATAC")
+
+p3 <- DimPlot(myObject, reduction = "umap.wnn", group.by = "seurat_clusters", label = TRUE, repel = TRUE) + ggtitle("WNN")
+
+figure_name <- ""
+figure_name <- paste(mysample, "Cluster_VlnPlot1.pdf", sep="")
+pdf(file=figure_name)
+p1+p3 & NoAxes()
 dev.off()
 
 figure_name <- ""
-figure_name <- paste(mysample, "_TSS.pdf", sep="")
+figure_name <- paste(mysample, "Cluster_VlnPlot2.pdf", sep="")
 pdf(file=figure_name)
-myObject$high.tss <- ifelse(myObject$TSS.enrichment > 3, 'High', 'Low')
-table(myObject$high.tss)
-TSSPlot(myObject, group.by = 'High') + NoLegend()
+p2+p3 & NoAxes()
 dev.off()
+
+p1 <- DimPlot(myObject, reduction = "umap.rna", group.by = "orig.ident", repel = TRUE) + ggtitle("RNA")
+
+p3 <- DimPlot(myObject, reduction = "umap.wnn", group.by = "orig.ident",  repel = TRUE) + ggtitle("WNN")
+
+figure_name <- ""
+figure_name <- paste(mysample, "ident_VlnPlot.pdf", sep="")
+
+pdf(file=figure_name, width =12) 
+p1+p3 & NoAxes()
+dev.off()
+
+DefaultAssay(myObject) <- "RNA"
+figure_name <-"" 
+figure_name <- paste(mysample, "Genes_merge_RNA_WNN.pdf", sep="") 
+pdf(file =figure_name, width =12) 
+FeaturePlot(myObject, features = c("sct_Rbfox3", "sct_Sebox", "sct_Gad1", "sct_Elavl3"), reduction = "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)
+FeaturePlot(myObject, features = c("sct_Sox9", "sct_Glul",  "sct_Rlbp1", "sct_Ascl1"), reduction =  "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)
+FeaturePlot(myObject, features = c( "sct_Otx2", "sct_Olig2", "sct_Crx", "sct_Neurog2"), reduction = "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)
+FeaturePlot(myObject, features = c("sct_Rho", "sct_Arr3", "sct_Tfap2b", "sct_Vsx1"), reduction =  "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)
+FeaturePlot(myObject, features = c("sct_Insm1", "sct_Prdm1", "sct_GFP", "sct_Elavl4"), reduction =  "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)
+dev.off()
+
+myObject$sample <- myObject$orig.ident 
+
+# Finder all markers
+DefaultAssay(myObject) <- "ATAC"
+myObject.atac.markers <- FindAllMarkers(myObject, assay = "ATAC", test.use = "LR", only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+myObject.atac.markers %>%
+  group_by(cluster) %>%
+  top_n(n = 2, wt = avg_log2FC)
+
+file_name <- paste(mysample, "MG_DEGs_CtrlvsKO.csv", sep="")
+write.csv(myObject.atac.markers, file=file_name)
+
+DefaultAssay(myObject) <- "ATAC"
 
 saveRDS(myObject, file = myRDS)
-
 
 
