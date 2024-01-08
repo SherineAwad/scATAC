@@ -7,7 +7,7 @@ rule all:
          input:
             expand("{sample}.rds", sample = SAMPLES),
             expand("{sample}_filtered.rds", sample = SAMPLES), 
-            "merged.rds"  
+            "merged.rds",  
 
 rule analyse:
       input: 
@@ -31,7 +31,7 @@ rule filter:
       shell: 
           "Rscript filter.R {input}"
  
-rule merge: 
+rule run_all: 
       input: 
           expand("{sample}_filtered.rds", sample =SAMPLES),
       params:
@@ -41,5 +41,6 @@ rule merge:
       shell: 
           """
           Rscript merge.R {input} {output} 
+          Rscript geneExp.R {output} 
           """
  
