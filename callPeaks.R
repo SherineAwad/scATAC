@@ -11,8 +11,12 @@ library(dplyr)
 set.seed(1234)
 
 args <- commandArgs(trailingOnly = TRUE)
-mysample <- args[1] 
+mysample <- args[1]
+mytsv <- paste(mysample, "_atac_fragments.tsv.gz", sep="")
+
 myRDS <- paste(mysample, ".rds", sep="") 
+myRDS
+
 myObject <- readRDS(myRDS)
 
 library(chromVAR)
@@ -24,12 +28,13 @@ library(patchwork)   ## For plotting graph, similar  ggplot2
 library(qlcMatrix)   ### For linking gene
 library('ggforce')
 
+annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79)
+genome(annotation) <- "mm10"
 
 
 #####
 DefaultAssay(myObject) <- "ATAC"
 
-if (FALSE){
 peaks <- CallPeaks(object = myObject)
 print("Peaks")
 head(peaks)
@@ -48,9 +53,10 @@ myObject[["peaks"]] <- CreateChromatinAssay(
   annotation = annotation
 )
 print("peaks chromassay")
-}
 
+saveRDS(myObject, file = myRDS)
 
+head (myObject[["peaks"]])
 figure_name <- ""
 figure_name <- paste(mysample, "Link_peak.genes.pdf", sep="")
 pdf(file=figure_name, width=12)
