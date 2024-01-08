@@ -26,21 +26,24 @@ rule analyse:
 rule filter: 
       input: 
           "{sample}.rds" 
+      params: 
+          "{sample}"
       output: 
           "{sample}_filtered.rds",  
       shell: 
-          "Rscript filter.R {input}"
+          "Rscript filter.R {params}"
  
 rule run_all: 
       input: 
           expand("{sample}_filtered.rds", sample =SAMPLES),
       params:
-          "merged"  
+          "{sample}"  
       output: 
           "merged.rds" 
       shell: 
           """
           Rscript merge.R {input} {output} 
-          Rscript geneExp.R {output} 
+          Rscript geneExp.R {params} 
+          Rscript callPeaks.R {params}
           """
  
