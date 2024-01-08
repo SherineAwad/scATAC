@@ -57,33 +57,15 @@ head(Fragments(myObject)[[1]])
 
 myObject <- TSSEnrichment(myObject)
 
-#print("This needs some feature from cell-ranger atac") 
-#myObject$pct_reads_in_peaks <- myObject$peak_region_fragments / myObject$passed_filters * 100
-#myObject$blacklist_ratio <- myObject$blacklist_region_fragments / myObject$peak_region_fragments
-
-
 DefaultAssay(myObject) <- "RNA"
 myObject[["percent.mt"]] <- PercentageFeatureSet(myObject, pattern = "^mt-")
 
 ### Check cell quality
 figure_name <- ""
 figure_name <- paste(mysample, "_QC_vlnplot.pdf", sep="") 
-pdf(file=figure_name)
+pdf(file=figure_name, width=12)
 VlnPlot(object = myObject, features = c("nCount_RNA", "nFeature_RNA", "nCount_ATAC", "TSS.enrichment", "nucleosome_signal", "percent.mt"),pt.size=0.1, ncol = 6)
 dev.off()
-
-#myObject$high.tss <- ifelse(myObject$TSS.enrichment > 2, 'High', 'Low')
-#figure_name <- "" 
-#figure_name <- paste(mysample, "TSS_plot.pdf", sep="")
-#pdf(file=figure_name)
-#TSSPlot(myObject, group.by = 'high.tss') + NoLegend()
-#dev.off() 
-#myObject$nucleosome_group <- ifelse(myObject$nucleosome_signal > 1.2, 'NS > 1.2', 'NS < 1.2')
-#figure_name <- "" 
-#figure_name <- paste(mysample, "nucleosome_plot.pdf", sep="")
-#pdf(file=figure_name)
-#FragmentHistogram(object = myObject, group.by = 'nucleosome_group')
-#dev.off()
 
 myObject <- subset(x = myObject,subset = nCount_ATAC < 100000 & nCount_RNA < 30000 & nCount_ATAC > 1000 & nCount_RNA > 1000 & nFeature_RNA > 500 & nucleosome_signal < 1.2 & TSS.enrichment > 2 & percent.mt < 15)
 
@@ -104,7 +86,7 @@ myObject <- RunUMAP(myObject, dims = 2:30, reduction = 'lsi',reduction.name = "u
 
 figure_name <- "" 
 figure_name <- paste(mysample, "depth_cor.pdf", sep="")
-pdf(file=figure_name)
+pdf(file=figure_name, width=12)
 DepthCor(myObject)
 dev.off()
 
@@ -118,7 +100,7 @@ myObject <- FindClusters(myObject, graph.name = "wsnn", resolution = 0.8, algori
 
 figure_name <- ""
 figure_name <- paste(mysample, "dim_plot.pdf", sep="")
-pdf(file=figure_name)
+pdf(file=figure_name, width=12)
 DimPlot(object = myObject, label = TRUE) + NoLegend() 
 dev.off()
 
@@ -131,13 +113,13 @@ p3 <- DimPlot(myObject, reduction = "umap.wnn", group.by = "seurat_clusters", la
 
 figure_name <- ""
 figure_name <- paste(mysample, "Cluster_VlnPlot1.pdf", sep="")
-pdf(file=figure_name)
+pdf(file=figure_name, width=12)
 p1+p3 & NoAxes()
 dev.off()
 
 figure_name <- ""
 figure_name <- paste(mysample, "Cluster_VlnPlot2.pdf", sep="")
-pdf(file=figure_name)
+pdf(file=figure_name, width=12)
 p2+p3 & NoAxes()
 dev.off()
 
@@ -148,14 +130,14 @@ p3 <- DimPlot(myObject, reduction = "umap.wnn", group.by = "orig.ident",  repel 
 figure_name <- ""
 figure_name <- paste(mysample, "ident_VlnPlot.pdf", sep="")
 
-pdf(file=figure_name, width =12) 
+pdf(file=figure_name, width=12) 
 p1+p3 & NoAxes()
 dev.off()
 
 DefaultAssay(myObject) <- "RNA"
 figure_name <-"" 
 figure_name <- paste(mysample, "Genes_merge_RNA_WNN.pdf", sep="") 
-pdf(file =figure_name, width =12) 
+pdf(file =figure_name, width=12) 
 FeaturePlot(myObject, features = c("sct_Rbfox3", "sct_Sebox", "sct_Gad1", "sct_Elavl3"), reduction = "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)
 FeaturePlot(myObject, features = c("sct_Sox9", "sct_Glul",  "sct_Rlbp1", "sct_Ascl1"), reduction =  "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)
 FeaturePlot(myObject, features = c( "sct_Otx2", "sct_Olig2", "sct_Crx", "sct_Neurog2"), reduction = "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)
