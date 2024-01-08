@@ -10,10 +10,10 @@ library(Matrix)
 library(dplyr)
 set.seed(1234)
 
-
+mysample <- args[1] 
 args <- commandArgs(trailingOnly = TRUE)
 
-myRDS <- paste(args[1], ".rds", sep="")   
+myRDS <- paste(mysample, ".rds", sep="")   
 myObject <- readRDS(myRDS)
 head(myObject)
 
