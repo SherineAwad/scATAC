@@ -10,12 +10,12 @@ library(Matrix)
 library(dplyr)
 set.seed(1234)
 
-mysample <- args[1] 
 args <- commandArgs(trailingOnly = TRUE)
+mysample <- args[1] 
+myRDS <- paste(mysample, ".rds", sep="")
+myRDS
 
-myRDS <- paste(mysample, ".rds", sep="")   
 myObject <- readRDS(myRDS)
-head(myObject)
 
 
 DefaultAssay(myObject) <- "ATAC"
@@ -31,7 +31,6 @@ myObject <- NormalizeData(
 )
 
 DefaultAssay(myObject) <- 'RNA'
-
 figure_name <- ""
 figure_name <- paste(mysample, "gene_activities.pdf", sep="")
 pdf(file=figure_name, width=12) 
