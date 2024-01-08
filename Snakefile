@@ -5,7 +5,8 @@ print(SAMPLES)
 
 rule all:
          input:
-            expand("{sample}_QC_vlnplot.pdf", sample = SAMPLES),
+            expand("{sample}.rds", sample = SAMPLES),
+            expand("{sample}_filtered.rds", sample = SAMPLES), 
             "merged.rds"  
 
 rule analyse:
@@ -15,16 +16,24 @@ rule analyse:
       params: 
           "{sample}"
       output: 
-           "{sample}_QC_vlnplot.pdf",
+           "{sample}.rds",
  
       shell: 
            """
            Rscript scATAC.R {params}  
            """
 
+rule filter: 
+      input: 
+          "{sample}.rds" 
+      output: 
+          "{sample}_filtered.rds",  
+      shell: 
+          "Rscript filter.R {input}"
+ 
 rule merge: 
       input: 
-          expand("{sample}.rds", sample =SAMPLES),
+          expand("{sample}_filtered.rds", sample =SAMPLES),
       params:
           "merged"  
       output: 
