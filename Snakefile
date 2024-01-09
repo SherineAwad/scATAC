@@ -20,7 +20,7 @@ rule analyse:
  
       shell: 
            """
-           Rscript scATAC.R {params}  
+           Rscript preprocess.R {params}  
            """
 
 rule filter: 
