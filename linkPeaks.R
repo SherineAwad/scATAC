@@ -43,8 +43,22 @@ print("done region stats")
 myObject <- LinkPeaks(object = myObject, peak.assay = "ATAC", expression.assay = "SCT", genes.use = c("Ascl1", "Otx2"))
 print("done linkpeaks") 
 
+figure_name <- "" 
+figure_name <- paste(mysample, "linkpeaks_coverage.pdf", sep="") 
+pdf(file =figure_name, width =12)
+p1 <- CoveragePlot(myObject,
+                   region = "Ascl1",
+                   features = "Ascl1",
+                   group.by = "seurat_clusters",
+                   extend.upstream = 1000,
+                   extend.downstream = 1000)
+p2 <- CoveragePlot(myObject,
+                   region = "Otx2",
+                   features = "Otx2",
+                   group.by = "seurat_clusters",
+                   extend.upstream = 1000,
+                   extend.downstream = 1000)
+patchwork::wrap_plots(p1, p2, ncol = 1)
+dev.off()
 
 
-} 
-#linkedGenes <- GetLinkedGenes(myObject, aPeaks, min.abs.score = 0)
-#head(linkedGenes) 
