@@ -58,7 +58,9 @@ head(Fragments(myObject)[[1]])
 myObject <- TSSEnrichment(myObject)
 
 DefaultAssay(myObject) <- "RNA"
-myObject[["percent.mt"]] <- PercentageFeatureSet(myObject, pattern = "^mt-")
+#myObject[["percent.mt"]] <- PercentageFeatureSet(myObject, pattern = "^mt-")
+myObject[["percent.mt"]] <- PercentageFeatureSet(object = myObject, pattern = "^MT-")
+
 
 ### Check cell quality
 figure_name <- ""
@@ -67,15 +69,7 @@ pdf(file=figure_name, width=12)
 VlnPlot(object = myObject, features = c("nCount_RNA", "nFeature_RNA", "nCount_ATAC", "TSS.enrichment", "nucleosome_signal", "percent.mt"),pt.size=0.1, ncol = 6)
 dev.off()
 
-myObject <- subset(x = myObject,subset = nCount_ATAC < 100000 & nCount_RNA < 30000 & nCount_ATAC > 1000 & nCount_RNA > 1000 & nFeature_RNA > 500 & nucleosome_signal < 1.2 & TSS.enrichment > 2 & percent.mt < 15)
-
-
-#### Analyze RNA part
-
-DefaultAssay(myObject) <- "RNA"
-
-myObject <- SCTransform(myObject, verbose = FALSE) %>% RunPCA() %>% RunUMAP(dims = 1:30, reduction.name = 'umap.rna', reduction.key = 'UMAP_')
-
+myRDS <- paste(mysample, "_preprocessed.rds", sep="")
 saveRDS(myObject, file = myRDS)
 
 

@@ -9,22 +9,32 @@ library(patchwork)
 library(Matrix)
 library(dplyr)
 set.seed(1234)
+args <- commandArgs(trailingOnly = TRUE)
 
+mysample1 <- args[1] 
+mysample2 <- args[2] 
+mysample3 <- args[3] 
+mysample4 <- args[4] 
+myRDS <- args[5] 
 
-mysample1 <- paste(args[1],".rds", sep="")
-mysample2 <- paste(args[2],".rds", sep="") 
-mysample3 <- paste(args[3],".rds", sep="")
-mysample4 <- paste(args[4],".rds", sep="")
+myObject1 <- paste(mysample1,".rds", sep="")
+myObject2 <- paste(mysample2,".rds", sep="") 
+myObject3 <- paste(mysample3,".rds", sep="")
+myObject4 <- paste(mysample4,".rds", sep="")
+myRDS <- paste(myRDS, ".rds", sep="")
 
-myRDS <- paste(args[5], ".rds", sep="")
+myObject1
+myObject2
+myObject3
+myObject4 
+myRDS 
 
-myObject1 <- readRDS(mysample1) 
-myObject2 <- readRDS(mysample2) 
-myObject3 <- readRDS(mysample3) 
-myObject4 <- readRDS(mysample4) 
+myObject1 <- readRDS(myObject1) 
+myObject2 <- readRDS(myObject2) 
+myObject3 <- readRDS(myObject3) 
+myObject4 <- readRDS(myObject4) 
 
-
-myObject <- merge(myObject1, y = c(myObject2, myObject3, myObject4), add.cell.ids = c("myObject1", "myObject2", "myObject3", "myObject4"), project = "myObject")
+myObject <- merge(myObject1, y = c(myObject2, myObject3, myObject4), add.cell.ids = c("mysample1", "mysample2", "mysample3", "mysample4"), project = "mergedObject")
 
 saveRDS(myObject, file = myRDS)
 

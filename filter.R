@@ -25,7 +25,9 @@ low_ts <- quantile(myObject[["TSS.enrichment"]]$TSS.enrishment, probs =0.09)
 high_ns 
 low_ts
 
-myObject <- subset(x = myObject,subset = nCount_ATAC < 100000 & nCount_RNA < 30000 & nCount_ATAC > 1000 & nCount_RNA > 1000 & nFeature_RNA > 500 & nucleosome_signal < high_ns & TSS.enrichment > low_ts  & percent.mt < 15)
+#myObject <- subset(x = myObject,subset = nCount_ATAC < 100000 & nCount_RNA < 30000 & nCount_ATAC > 1000 & nCount_RNA > 1000 & nFeature_RNA > 500 & nucleosome_signal < high_ns & TSS.enrichment > low_ts  & percent.mt < 15)
+myObject <- subset(x = myObject,subset = nCount_ATAC < 100000 & nCount_RNA < 30000 & nCount_ATAC > 1000 & nCount_RNA > 1000 & nFeature_RNA > 500 & nucleosome_signal < 1.2 & TSS.enrichment > 2 & percent.mt < 15)
+
 
 myRDS <- paste(mysample, "_filtered.rds", sep="") 
 saveRDS(myObject, file = myRDS)
