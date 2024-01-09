@@ -52,20 +52,26 @@ da_peaks <- FindMarkers(
   min.pct = 0.05,
   latent.vars = 'nCount_peaks'
 )
+print(da_peaks)
 head(da_peaks) 
 # get top differentially accessible peaks
-top.da.peak <- rownames(da_peaks[da_peaks$p_val < 0.005, ])
+#top.da.peak <- rownames(da_peaks[da_peaks$p_val < 0.005, ])
 
-summary(top.da.peak)
+#summary(top.da.peak)
 
 
-# test enrichment
+atac_small = RegionStats(myObject, genome = BSgenome.Mmusculus.UCSC.mm10)
+#test_peaks <- rownames(atac_small@assays$peaks@meta.features[1:100,])
+print(atac_small) 
+head(atac_small@assays$peaks@meta.features)
+class(atac_small@assays$peaks@meta.features)
+de.motif <- head(rownames(atac_small))
+bg.peaks <- tail(rownames(atac_small))
 enriched.motifs <- FindMotifs(
-  object = myObject,
-  features = top.da.peak
+  object = atac_small,
+  features = de.motif,
+  background = bg.peaks
 )
-
-enriched_motifs 
 
 figure_name <- "" 
 figure_name <- paste(mysample, "_enriched_motifs.pdf", sep="")
