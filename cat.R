@@ -12,12 +12,22 @@ library(tidyr)
 set.seed(1234)
 
 
+#rename column query region in merged3samplesannotatedDEGs.csv to gene to be the same as the gene column in merged3samplesDEGs.csv
 
 df1 <- read.csv("merged3samplesDEGs.csv", head = TRUE, sep=",")
 df2 <- read.csv("merged3samplesannotatedDEGs.csv", head = TRUE, sep=",") 
 
-r <- merge(df1, df2,by=c("pos","pos"),all.x=F)
+dim(df1)
+dim(df2)
 
-write.csv(r,"DEGs.csv" , all(T) )
+unique_df1 <- unique(df1[c("gene", "cluster","p_val","avg_log2FC","p_val_adj")]) 
+head(unique_df1) 
+
+unique_df2 <- unique(df2[c("query_region","tx_id","gene_name","gene_id","gene_biotype","type","closest_region")]) 
+head(unique_df2) 
+
+r <- merge(unique_df1, unique_df2,  by.x = "gene", by.y ="query_region",all=F)
+dim(r)
+write.csv(r,"allDEGs.csv", all(F), row.names= FALSE)
 
 

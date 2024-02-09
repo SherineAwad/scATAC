@@ -38,12 +38,6 @@ file_name <- paste(mysample, "annotatedDEGs.csv", sep="")
 
 write.csv(Nearby_genes, file=file_name)
 
-file_name <- "" 
-file_name <- paste(mysample, "AllDEGs.csv", sep="")
-df  = data.frame(myObject.atac.markers,Nearby_genes)
-write.csv(df, file = file_name)
-
-
 DefaultAssay(myObject) <- "ATAC"
 myRDS <- paste(mysample, "_diffPeaks.rds", sep="")
 saveRDS(myObject, file = myRDS)
