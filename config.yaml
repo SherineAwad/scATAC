@@ -1,0 +1,15 @@
+#---------------------------------------------------
+#General Parameters 
+#---------------------------------------------------
+SAMPLES: "samples.tsv"
+OBJECT: "merged3samples" 
+nATAC1: 100000
+nRNA1: 30000 
+nATAC2: 1000 
+nRNA2: 1000 
+features: 500
+nucl: 1.2 
+tss: 2
+mt: 15 
+
+
