@@ -104,7 +104,7 @@ saveRDS(myObject, file = myRDS)
 
 DefaultAssay(myObject) <- "RNA"
 figure_name <-"" 
-figure_name <- paste(mysample, "_RNA_WNN.pdf", sep="") 
+figure_name <- paste(mysample, "_features.pdf", sep="") 
 pdf(file =figure_name, width=12) 
 FeaturePlot(myObject, features = c("sct_Rbfox3", "sct_Sebox", "sct_Gad1", "sct_Elavl3"), reduction = "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)
 FeaturePlot(myObject, features = c("sct_Sox9", "sct_Glul",  "sct_Rlbp1", "sct_Ascl1"), reduction =  "umap.wnn", cols = c("lightgrey", "red"), pt.size = 0.01)

@@ -13,158 +13,158 @@ set.seed(1234)
 
 args <- commandArgs(trailingOnly = TRUE)
 mysample <- args[1]
+myCell <- args[2] 
 myRDS <- paste(mysample, "_diffPeaks.rds", sep="")
 myRDS
 
 myObject <- readRDS(myRDS)
-head(myObject)
 
 DefaultAssay(myObject) <- "ATAC"
 
+myfile = paste(myCell, "_sorted.csv", sep="")
+myfile 
+df <- readfile <- read.csv(myfile, head = TRUE, sep=",")
+
+regions = df[1] 
+top_regions = regions[1:15,]
+
+
 figure_name <- ""
-figure_name <- paste(mysample, "_linkCoverage1.pdf", sep="")
+figure_name <- paste(myCell, "_coverage.pdf", sep="")
 pdf(file =figure_name, width=20, height= 60)
 p1 <- CoveragePlot(
   object = myObject,
-  region = "chr18-74025498-74026454",
+  region = top_regions[1],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
 p2 <- CoveragePlot(
   object = myObject,
-  region = "chr12-112743042-112743995",
+  region = top_regions[2],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
 p3 <- CoveragePlot(
   object = myObject,
-  region = "chr18-80986389-80987280",
+  region = top_regions[3],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
 p4 <- CoveragePlot(
   object = myObject,
-  region = "chr3-108092272-108093221",
+  region = top_regions[4],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
+
 p5 <- CoveragePlot(
   object = myObject,
-  region = "chr19-56721560-56722478",
+  region = top_regions[5],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
-patchwork::wrap_plots(p1, p2, p3, p4, p5, ncol=1) 
-dev.off() 
-
-figure_name <- ""
-figure_name <- paste(mysample, "_linkCoverage2.pdf", sep="")
-pdf(file =figure_name, width=20, height= 60)
-p6 <- CoveragePlot(object = myObject,
-  region = "Rbfox3",
+p6 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[6],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
-p7 <- CoveragePlot(object = myObject,
-  region = "Sox9",
+p7 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[7],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
-p8 <- CoveragePlot(object = myObject,
-  region = "Otx2",
+p8 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[8],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
-
-p9 <- CoveragePlot(object = myObject,
-  region = "Rho",
+p9 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[9],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
-
-p10 <- CoveragePlot(object = myObject,
-  region = "Insm1",
+p10 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[10],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
-patchwork::wrap_plots(p6, p7, p8, p9, p10, ncol=1)
-dev.off() 
 
-figure_name <- ""
-figure_name <- paste(mysample, "_linkCoverage3.pdf", sep="")
-pdf(file =figure_name, width=20, height= 60)
-p11 <- CoveragePlot(object = myObject,
-  region = "Ascl1",
+p11 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[11],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
-p12 <- CoveragePlot(object = myObject,
-  region = "Sebox",
+p12 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[12],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
-p13 <- CoveragePlot(object = myObject,
-  region = "Glul",
+p13 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[13],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
-p14 <- CoveragePlot(object = myObject,
-  region = "Olig2",
+p14 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[14],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
-p15 <- CoveragePlot(object = myObject,
-  region = "Arr3",
+p15 <- CoveragePlot(
+  object = myObject,
+  region = top_regions[15],
   annotation = TRUE,
   peaks = TRUE,
+  extend.upstream = 2000,
+  extend.downstream = 2000,
 )
 
-
-patchwork::wrap_plots(p11, p12, p13, p14, p15, ncol =1) 
+patchwork::wrap_plots(p1, p2, p3,p4,p5,p6,p7,p8,p9,p10,p11, p12,p13,p14,p15, ncol=1)
 dev.off()
 
-figure_name <- ""
-figure_name <- paste(mysample, "_linkCoverage4.pdf", sep="")
-pdf(file =figure_name, width=20, height= 60)
-p16 <- CoveragePlot(object = myObject,
-  region = "Gad1",
-  annotation = TRUE,
-  peaks = TRUE,
-)
-
-p17 <- CoveragePlot(object = myObject,
-  region = "Rlbp1",
-  annotation = TRUE,
-  peaks = TRUE,
-)
-
-p18 <- CoveragePlot(object = myObject,
-  region = "Crx",
-  annotation = TRUE,
-  peaks = TRUE,
-)
-
-p19 <- CoveragePlot(object = myObject,
-  region = "Elavl3",
-  annotation = TRUE,
-  peaks = TRUE,
-)
-
-p20 <- CoveragePlot(object = myObject,
-  region = "Neurog2",
-  annotation = TRUE,
-  peaks = TRUE,
-)
-
-patchwork::wrap_plots(p16, p17, p18, p19, p20, ncol=1)
-dev.off()
