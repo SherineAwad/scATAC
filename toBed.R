@@ -58,10 +58,11 @@ head(pos_HC)
 head(pos_Microglia)
 head(pos_Endo)
 
+mybed <- makeGRangesFromDataFrame(pos,ignore.strand=FALSE, starts.in.df.are.0based=TRUE)
+rtracklayer::export.bed(mybed, "diffPeaks.bed", "bed")
 
-mybed <- makeGRangesFromDataFrame(pos_cone,ignore.strand=FALSE, starts.in.df.are.0based=TRUE,keep.extra.columns=TRUE)
+mybed <- makeGRangesFromDataFrame(pos_cone,ignore.strand=FALSE, starts.in.df.are.0based=TRUE)
 rtracklayer::export.bed(mybed, "cone_diffPeaks.bed", "bed")
-rtracklayer::export.bw(mybed, con = "cone.bw", format = 'bigWig')
 
 
 mybed <- makeGRangesFromDataFrame(pos_Rod,ignore.strand=FALSE, starts.in.df.are.0based=TRUE)

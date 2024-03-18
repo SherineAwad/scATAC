@@ -13,7 +13,7 @@ set.seed(1234)
 args <- commandArgs(trailingOnly = TRUE)
 mysample <- args[1]
 
-myRDS <- paste(mysample, ".rds", sep="")
+myRDS <- paste(mysample, "_filtered.rds", sep="")
 myRDS
 
 myObject <- readRDS(myRDS)

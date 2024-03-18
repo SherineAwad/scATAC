@@ -20,7 +20,7 @@ myObject <- readRDS(myRDS)
 
 # Finder all markers
 DefaultAssay(myObject) <- "ATAC"
-myObject.atac.markers <- FindAllMarkers(myObject, assay = "ATAC", test.use = "LR", only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+myObject.atac.markers <- FindAllMarkers(myObject, assay = "ATAC", test.use = "wilcox", only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
 
 head(myObject.atac.markers)
 

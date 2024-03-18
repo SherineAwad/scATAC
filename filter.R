@@ -36,11 +36,8 @@ myRDS
 myObject <- readRDS(myRDS)
 
 
-#myObject <- subset(x = myObject,subset = nCount_ATAC < 100000 & nCount_RNA < 30000 & nCount_ATAC > 1000 & nCount_RNA > 1000 & nFeature_RNA > 500 & nucleosome_signal < 1.2 & TSS.enrichment > 2 & percent.mt < 15)
 myObject <- subset(x = myObject,subset = nCount_ATAC < nATAC1 & nCount_RNA < nRNA1 & nCount_ATAC > nATAC2 & nCount_RNA > nRNA2 & nFeature_RNA > features & nucleosome_signal < nucl & TSS.enrichment > tss & percent.mt < mt)
 
-
-#myObject <- subset(x = myObject,subset = nCount_ATAC < 100000 & nCount_RNA < 30000 & nCount_ATAC > 1000 & nCount_RNA > 1000 & nFeature_RNA > 500 & nucleosome_signal < 1.0  & TSS.enrichment > 5 & percent.mt < 20) 
 myRDS <- paste(mysample, "_filtered.rds", sep="") 
 saveRDS(myObject, file = myRDS)
 
