@@ -28,6 +28,13 @@ myObject.atac.markers %>%
   group_by(cluster) %>%
   top_n(n = 2, wt = avg_log2FC)
 
+figure_name <- ""
+figure_name <- paste(mysample, "_heatmap.pdf", sep="")
+pdf(file =figure_name, width=20, height= 60)
+DoHeatmap(object = myObject,features = myObject.atac.markers$gene )
+dev.off()
+
+
 file_name <- paste(mysample, "DEGs.csv", sep="")
 write.csv(myObject.atac.markers, file=file_name)
 
@@ -41,6 +48,5 @@ write.csv(Nearby_genes, file=file_name)
 DefaultAssay(myObject) <- "ATAC"
 myRDS <- paste(mysample, "_diffPeaks.rds", sep="")
 saveRDS(myObject, file = myRDS)
-
 
 
